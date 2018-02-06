@@ -1,0 +1,75 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  cluster_public_key:
+    type: string
+  cluster_public_net:
+    type: string
+    description: ID or name of public network
+  cluster_zone:
+    type: string
+    default: compute2
+  cluster_name:
+    type: string
+    default: virtual-mcp11-ovs
+  cluster_domain:
+    type: string
+  cluster_nameservers:
+    type: comma_delimited_list
+    description: DNS nameservers to be assigned to nodes
+  cluster_node_count:
+    type: string
+    default: 1
+  cluster_flavor:
+    type: string
+  cluster_compute_flavor:
+    type: string
+    default: oc_aio_large   
+  stack_name:
+    type: string
+    default: os-ha-komarek15
+  network01_name:
+    type: string
+    default: os-ha-komarek15-net01
+  network02_name:
+    type: string
+    default: os-ha-komarek15-net02
+  network01_prefix:
+    type: string
+    default: 192.168.10
+  network02_prefix:
+    type: string
+    default: 172.16.10
+  cfg_reclass_address:
+    type: string
+  instance_name:
+    type: string
+    default: "trilio_vm"
+  key_pair:
+    type: string
+    default: "nfs-key"
+  cluster_image:
+    type: string
+
+
+resources:
+  mcp_trilio_tvm:
+    type: MCP::SingleInstance
+    properties:
+      key_pair: { get_param: stack_name }
+      network: { get_param: stack_name }
+  #    network02: { get_param: network02_name }
+      security_group: { get_param: stack_name }
+      network01_prefix: { get_param: network01_prefix }
+      network02_prefix: { get_param: network02_prefix }
+      instance_name: { get_param: instance_name }
+      instance_domain:
+        list_join:
+        - '.'
+        - [ { get_param: stack_name }, { get_param: cluster_domain } ]
+      instance_cluster: { get_param: cluster_name }
+      instance_zone: { get_param: cluster_zone}
+      instance_os: trusty
+      instance_image: { get_param: cluster_image }
+      instance_flavor: { get_param: cluster_flavor}
+      instance_config_host: 127.0.0.1
